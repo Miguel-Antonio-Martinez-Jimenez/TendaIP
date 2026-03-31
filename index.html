@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Panel Tenda Pro</title>
+<title>Panel Tenda PRO+</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -21,8 +21,8 @@ body {
 
 .card {
     background: #111827;
-    border: 1px solid #1f2937;
     border-radius: 15px;
+    border: 1px solid #1f2937;
     box-shadow: 0 0 20px rgba(13,110,253,0.15);
 }
 
@@ -30,29 +30,22 @@ body {
     background: #0d6efd;
     color: white;
     border: none;
-    transition: 0.3s;
 }
 
 .btn-blue:hover {
     background: #0b5ed7;
-    transform: scale(1.03);
 }
 
 .status {
-    font-weight: bold;
     font-size: 18px;
+    font-weight: bold;
 }
 
-.online {
-    color: #00ff9c;
-}
+.online { color: #00ff9c; }
+.offline { color: #ff4d4d; }
 
-.offline {
-    color: #ff4d4d;
-}
-
-.glow {
-    text-shadow: 0 0 10px #0d6efd;
+.table-dark {
+    background: #0f172a;
 }
 </style>
 
@@ -61,7 +54,7 @@ body {
 
 <nav class="navbar p-3">
     <div class="container-fluid">
-        <h4 class="text-primary glow">⚡ Panel Router Tenda</h4>
+        <h4 class="text-primary">⚡ Panel Tenda PRO+</h4>
     </div>
 </nav>
 
@@ -73,13 +66,13 @@ body {
         <div class="col-md-6">
             <div class="card p-4">
                 <h5>🌐 Estado de Red</h5>
-                <p><strong>Red esperada:</strong> Tienda</p>
-                <p><strong>Router IP:</strong> 192.168.1.67</p>
+                <p><strong>Red:</strong> Tienda</p>
+                <p><strong>IP Router:</strong> 192.168.1.67</p>
 
                 <p id="estado" class="status">Verificando...</p>
 
                 <button class="btn btn-blue w-100" onclick="checkStatus()">
-                    🔍 Verificar conexión
+                    Verificar conexión
                 </button>
             </div>
         </div>
@@ -90,27 +83,40 @@ body {
                 <h5>⚙️ Acciones</h5>
 
                 <button class="btn btn-blue w-100 mb-2" onclick="openRouter()">
-                    🔗 Abrir Router
+                    Abrir Router
                 </button>
 
-                <button class="btn btn-danger w-100 mb-2" onclick="pingRouter()">
-                    📡 Ping Router
+                <button class="btn btn-warning w-100 mb-2" onclick="scanDevices()">
+                    Escanear dispositivos
                 </button>
 
-                <button class="btn btn-warning w-100" onclick="restartRouter()">
-                    ♻️ Reiniciar (simulado)
+                <button class="btn btn-danger w-100" onclick="alert('Requiere acceso interno del router')">
+                    Reiniciar Router
                 </button>
             </div>
         </div>
 
-        <!-- Info -->
+        <!-- Dispositivos -->
         <div class="col-12">
             <div class="card p-4">
-                <h5>📊 Información</h5>
-                <p id="info">
-                    Este panel detecta si estás conectado a la red <strong>Tienda</strong> 
-                    verificando acceso al router.
-                </p>
+                <h5>📡 Dispositivos conectados</h5>
+
+                <table class="table table-dark table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Dispositivo</th>
+                            <th>IP</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="devicesTable">
+                        <tr>
+                            <td colspan="4">No escaneado</td>
+                        </tr>
+                    </tbody>
+                </table>
+
             </div>
         </div>
 
@@ -122,7 +128,7 @@ body {
 
 const routerIP = "192.168.1.67";
 
-// Detectar conexión automáticamente
+// Verificar conexión
 function checkStatus() {
     const estado = document.getElementById("estado");
 
@@ -132,7 +138,7 @@ function checkStatus() {
         estado.className = "status online";
     })
     .catch(() => {
-        estado.innerHTML = "🔴 No estás en la red Tienda";
+        estado.innerHTML = "🔴 No estás en la red";
         estado.className = "status offline";
     });
 }
@@ -142,25 +148,39 @@ function openRouter() {
     window.open(`http://${routerIP}`, "_blank");
 }
 
-// Simular ping
-function pingRouter() {
-    const estado = document.getElementById("estado");
+// Simulación de escaneo
+function scanDevices() {
+    const table = document.getElementById("devicesTable");
 
-    estado.innerHTML = "📡 Haciendo ping...";
-    estado.className = "status";
+    table.innerHTML = `
+        <tr><td colspan="4">Escaneando red...</td></tr>
+    `;
 
     setTimeout(() => {
-        estado.innerHTML = "🟢 Router responde correctamente";
-        estado.className = "status online";
-    }, 1500);
+        table.innerHTML = `
+            <tr>
+                <td>1</td>
+                <td>📱 Celular</td>
+                <td>192.168.1.10</td>
+                <td class="online">Activo</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>💻 Laptop</td>
+                <td>192.168.1.15</td>
+                <td class="online">Activo</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>📺 Smart TV</td>
+                <td>192.168.1.20</td>
+                <td class="offline">Inactivo</td>
+            </tr>
+        `;
+    }, 2000);
 }
 
-// Reinicio (simulado)
-function restartRouter() {
-    alert("⚠️ Para reiniciar el router necesitas acceso interno o backend");
-}
-
-// Auto check al cargar
+// Auto detectar al cargar
 window.onload = checkStatus;
 
 </script>
